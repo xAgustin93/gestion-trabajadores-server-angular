@@ -69,7 +69,7 @@ function loginEmployee(req, res){
                             // Devolvemos un Token de JWT.
                             res.status(200).send({token: jwt.createToken(employee)});
                         } else {
-                            res.status(200).send({employee: employee});
+                            res.status(200).send({employee});
                         }
                     } else {
                         res.status(404).send({message: 'El empleado no ha podido logearse.'})

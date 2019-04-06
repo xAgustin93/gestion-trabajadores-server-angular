@@ -15,8 +15,6 @@ function addAd(req, res) {
     ad.title = params.title;
     ad.description = params.description;
 
-    console.log(ad);
-
     ad.save((err, adStore) => {
         if(err) {
             res.status(500).send({message: 'Error de servidor.'});
@@ -30,6 +28,43 @@ function addAd(req, res) {
     })
 }
 
+function getAds(req, res) {
+    var find = Ads.find().sort({date: 'desc'});
+
+    find.exec((err, ads) => {
+        if(err){
+            res.status(500).send({message: 'Error de servidor.'});
+        } else {
+            if(!ads){
+                res.status(404).send({message: 'No se ha encontrado ninguna noticia.'});
+            } else {
+                res.status(200).send({ads});
+            }
+        }
+    });
+}
+
+function deleteAd(req, res) {
+
+    const params = req.params;
+    const id = params.id
+
+    Ads.findByIdAndDelete({_id: id}, (err, adDelete) => {
+        if(err) {
+            res.status(500).send({message: 'Error de servidor.'});
+        } else {
+            if(!adDelete){
+                return res.status(404).send({message: 'No se ha podido borrar la noticia.'});
+            } else {
+                return res.status(202).send({ad: adDelete});
+            } 
+        }
+    });
+}
+
+
 module.exports = {
-    addAd
+    addAd,
+    getAds,
+    deleteAd
 };
