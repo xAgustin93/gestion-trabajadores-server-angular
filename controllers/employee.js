@@ -13,8 +13,8 @@ function registrationEmployee(req, res) {
     employee.name = params.name;
     employee.lastname = params.lastname;
     employee.dni = '';
-    employee.date_start = '';
-    employee.date_end = '';
+    employee.start_contract = '';
+    employee.end_contract = '';
     employee.type_contract = '';
     employee.bank_name = '';
     employee.back_holder = '';
@@ -84,8 +84,44 @@ function getEmployees(req, res) {
     console.log('getEmployees Method Load');
 }
 
+function getEmployeeById(req, res) {
+    const userId = req.params.id;
+    
+    Employee.findById(userId, (err, employee) => {
+        if(err) {
+            res.status(500).send({message: 'Error de servidor'});
+        } else {
+            if(!employee) {
+                res.status(404).send({message: 'No se ha encontrado ningun empleado'});
+            } else {
+                res.status(200).send(employee);
+            }
+        }
+    });
+}
+
+function updateEmployeeById(req, res) {
+    const employeeId = req.body._id;
+    const params = req.body;
+    
+    Employee.findByIdAndUpdate({_id: employeeId}, params, (err, employeUpdate) => {
+        if(err) {
+            res.status(500).send({message: 'Error de servidor'});
+        } else {
+            if(!employeUpdate) {
+                res.status(404).send({message: 'No se ha encontrado el usuario que se quiere modificar'});
+            } else {
+                res.status(200).send({employee: params});
+            }
+        }
+    });
+}
+
+
 module.exports = {
     registrationEmployee,
     loginEmployee,
     getEmployees,
+    getEmployeeById,
+    updateEmployeeById
 };
