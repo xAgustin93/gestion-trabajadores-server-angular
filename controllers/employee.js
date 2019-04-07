@@ -81,7 +81,20 @@ function loginEmployee(req, res){
 }
 
 function getEmployees(req, res) {
-    console.log('getEmployees Method Load');
+    
+    var find = Employee.find().sort({name: 'desc'});
+
+    find.exec( (err, employees) => {
+        if(err) {
+            res.status(500).send({message: 'Error de servidor.'});
+        } else {
+            if(!employees) {
+                res.status(404).send({message: 'No se ha encontrado ningun empleado'});
+            } else {
+                res.status(200).send({employees});
+            }
+        }
+    });
 }
 
 function getEmployeeById(req, res) {
@@ -103,19 +116,120 @@ function getEmployeeById(req, res) {
 function updateEmployeeById(req, res) {
     const employeeId = req.body._id;
     const params = req.body;
+
+    var answerRemovedSave;
+
+    let newPassword = params.password;
+
+    Employee.findById({_id: employeeId}, (err, employee) => {
+        if(err) {
+            res.status(500).send({message: 'Error del servidor'});
+        } else {
+            if(!employee) {
+                res.status(404).send({message: 'No se ha encontrado el usuario que se quiere modificar'});
+            } else {
+                let lastPassword = employee.password;
+                var paramsUpdate = params;
+
+                if(lastPassword !== newPassword) {
+
+                    bcrypt.hash(newPassword, null, null, function(err, hash) {
+                        paramsUpdate.password = hash;
+
+                        Employee.findByIdAndUpdate({_id: employeeId}, paramsUpdate, (err, employeUpdateData) => {
+                            if(err) {
+                                res.status(500).send({message: 'Error del servidor'});
+                            } else {
+                                if(!employeUpdateData) {
+                                    res.status(404).send({message: 'No se ha encontrado el usuario que se quiere modificar'});
+                                } else {
+                                    res.status(200).send({employee: employeUpdateData});
+                                }
+                            }
+                        });
+                    });
+
+                } else {
+                    Employee.findByIdAndUpdate({_id: employeeId}, paramsUpdate, (err, employeUpdateData) => {
+                        if(err) {
+                            res.status(500).send({message: 'Error del servidor'});
+                        } else {
+                            if(!employeUpdateData) {
+                                res.status(404).send({message: 'No se ha encontrado el usuario que se quiere modificar'});
+                            } else {
+                                res.status(200).send({employee: employeUpdateData});
+                            }
+                        }
+                    });
+                }
+                
+            } 
+        }
+    });
+}
+
+function createEmployee(req, res) {
+    let employee = new Employee;
+
+    const body = req.body;
+    employee.name = body.name;
+    employee.lastname = body.lastname;
+    employee.dni = body.dni;
+    employee.start_contract = body.start_contract;
+    employee.end_contract = body.end_contract;
+    employee.type_contract = body.type_contract;
+    employee.bank_name = '';
+    employee.back_holder = '';
+    employee.back_number = '';
+    employee.email = body.email.toLowerCase();
+    employee.password = body.password;
+    employee.role = body.role;
+    employee.active = true;
+
+    if(employee.password) {
+        bcrypt.hash(body.password, null, null, function(err, hash) {
+            employee.password = hash;
+            
+            if(employee.name != '' && employee.lastname != '' && employee.dni != '' && employee.start_contract != '' && 
+                employee.end_contract != '' && employee.type_contract != '' && employee.email != '' && employee.password != '' && employee.role != '' && employee.active != ''){
+                employee.save((err, employeeStored) => {
+                    if(err) {
+                        res.status(500).send({message: 'Error de servidor. CreateEmployee.'})
+                    } else {
+                        if(!employeeStored) {
+                            res.status(404).send({message: 'No se ha podido crear el usuario'});
+                        } else {
+                            res.status(200).send({employee: employeeStored});
+                        }
+                    }
+                })
+            } else {
+                res.status(404).send({message: 'No se ha podido crear el usuario'});
+            }
+        });
+    } else {
+        res.status(200).send({message: 'Introduce una contraseña.'});
+    }
+}
+
+function deleteEmployee(req, res) {
+    const employeId = req.params.id;
     
-    Employee.findByIdAndUpdate({_id: employeeId}, params, (err, employeUpdate) => {
+    Employee.findByIdAndDelete({_id: employeId}, (err, employeeDelete) => {
         if(err) {
             res.status(500).send({message: 'Error de servidor'});
         } else {
-            if(!employeUpdate) {
-                res.status(404).send({message: 'No se ha encontrado el usuario que se quiere modificar'});
+            if(!employeeDelete) {
+                res.status(404).send({message: 'No se ha encontrado ningun empleado'});
             } else {
-                res.status(200).send({employee: params});
+                res.status(200).send({employee: employeeDelete});
             }
         }
     });
 }
+
+
+
 
 
 module.exports = {
@@ -123,5 +237,7 @@ module.exports = {
     loginEmployee,
     getEmployees,
     getEmployeeById,
-    updateEmployeeById
+    updateEmployeeById,
+    createEmployee,
+    deleteEmployee
 };
