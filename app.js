@@ -9,6 +9,7 @@ var app = express();
 // Load routing
 var employee_routes = require('./routers/employee');
 var ads_routes = require('./routers/ads');
+var ads_proposal = require('./routers/proposal');
 
 
 app.use(bodyParser.urlencoded({
@@ -29,6 +30,7 @@ app.use((req, res, next) => {
 // Router Basic
 app.use('/api', employee_routes);
 app.use('/api', ads_routes);
+app.use('/api', ads_proposal);
 
 
 module.exports = app;
