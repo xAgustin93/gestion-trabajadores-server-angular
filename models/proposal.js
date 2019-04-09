@@ -8,7 +8,7 @@ var ProposalSchema = Schema({
     title: String,
     description: String,
     like: Number,
-    disLike: Number,
+    dislike: Number,
     active: Boolean,
     employee_actions: Array
 });

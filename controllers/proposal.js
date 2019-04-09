@@ -54,24 +54,39 @@ function updateProposal(req, res) {
 
     const params = req.body;
 
-    Proposal.findByIdAndUpdate({_id: proposalId}, (err, proposalUpdate) => {
+    Proposal.findByIdAndUpdate({_id: proposalId}, params, (err, proposalUpdate) => {
         if(err) {
-
+            res.status(500).send({message: 'Error de servidor.'});
         } else {
             if(!proposalUpdate) {
-
+                res.status(404).send({message: 'No se ha encontrado ninguna propuesta.'});
             } else {
-                
+                res.status(200).send({proposal: proposalUpdate});
             }
         }
-    })
+    });
+}
 
+function deleteProposal(req, res) {
+    let proposalId = req.params.id;
 
+    Proposal.findByIdAndDelete({_id: proposalId}, (err, proposalDelete) => {
+        if(err) {
+            res.status(500).send({message: 'Error de servidor.'});
+        } else {
+            if(!proposalDelete) {
+                res.status(404).send({message: 'No se ha encontrado ninguna propuesta.'});
+            } else {
+                res.status(200).send({proposal: proposalDelete});
+            }
+        }
+    });
 }
 
 
 module.exports = {
     addPorposal,
     getProposals,
-    updateProposal
+    updateProposal,
+    deleteProposal
 };
