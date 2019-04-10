@@ -6,3 +6,6 @@
 # System Files
 .DS_Store
 Thumbs.db
+
+# Other
+/uploads/payroll
