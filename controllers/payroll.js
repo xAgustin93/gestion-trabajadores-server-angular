@@ -25,9 +25,6 @@ function addPayroll(req, res) {
             }
         }
     });
-
-
-
 }
 
 function addPayrollFile(req, res) {

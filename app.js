@@ -9,8 +9,9 @@ var app = express();
 // Load routing
 var employee_routes = require('./routers/employee');
 var ads_routes = require('./routers/ads');
-var proposal_proposal = require('./routers/proposal');
-var payroll_payroll = require('./routers/payroll');
+var proposal_routes = require('./routers/proposal');
+var payroll_routes = require('./routers/payroll');
+var fichador_routes = require('./routers/fichador');
 
 
 app.use(bodyParser.urlencoded({
@@ -31,8 +32,9 @@ app.use((req, res, next) => {
 // Router Basic
 app.use('/api', employee_routes);
 app.use('/api', ads_routes);
-app.use('/api', proposal_proposal);
-app.use('/api', payroll_payroll);
+app.use('/api', proposal_routes);
+app.use('/api', payroll_routes);
+app.use('/api', fichador_routes);
 
 
 module.exports = app;
